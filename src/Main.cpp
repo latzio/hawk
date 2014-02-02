@@ -25,9 +25,6 @@
 
 #include <stdlib.h>
 
-using blocks::GameLogic;
-using blocks::Platform;
-
 int main(int argc, char ** argv) {
 
     Platform platform;

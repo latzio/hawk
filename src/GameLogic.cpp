@@ -42,10 +42,6 @@
 #define LEADERBOARD_LINE_OFFSET_X 30.0f
 #define LEADERBOARD_LINE_OFFSET_Y 30.0f
 
-namespace blocks {
-
-
-
 GameLogic::GameLogic(Platform &platform)
     : HawkInputHandler()
     , m_platform(platform)
@@ -53,9 +49,6 @@ GameLogic::GameLogic(Platform &platform)
     , m_gamePaused(true)
     , m_gameFinished(false)
     , m_state(FetchUser)
-    , m_velocityTreshold(0.001f)
-    , m_angstCountdown(2l)
-    , m_showClock(false)
     , m_scoreTime(0)
     , m_resumeTime(0)
     , m_score(0)
@@ -229,10 +222,6 @@ void GameLogic::update()
     m_scoreTime += (now - m_resumeTime);
     m_resumeTime = now;
 
-    if (!m_showClock) {
-        m_score = 1000 / static_cast<int>(m_scoreTime + 1);
-    }
-
     HawkPoint position = m_player.body()->GetPosition();
     if (Hawk::m2Pix(position.y) < -m_player.height()) {
         endGamePlay(false);
@@ -321,11 +310,6 @@ void GameLogic::renderGame()
 
     bbutil_render_text(m_scoreFont, buf, m_scorePosX, m_scorePosY, 0.75f, 0.75f, 0.75f, 1.0f);
 
-    //Display timer if it is available
-    if (m_showClock) {
-        sprintf(buf, "Time left %i", m_time - m_scoreTime - 1);
-        bbutil_render_text(m_font, buf, m_timerPosX, m_timerPosY, 0.75f, 0.75f, 0.75f, 1.0f);
-    }
     m_platform.finishRender();
 }
 
@@ -378,35 +362,6 @@ void GameLogic::renderLeadBoard()
     m_platform.finishRender();
 }
 
-void GameLogic::addNextShape(float x, float y)
-{
-    /*
-    if (m_numBlocks == m_blocks.size()) {
-        return;
-    }
-
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(x * m_b2ScaleFactor, y * m_b2ScaleFactor);
-
-    m_blocks[m_numBlocks].body = m_world.CreateBody(&bodyDef);
-
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox((m_blocks[m_numBlocks].Width() / 2 - 1.5f) * m_b2ScaleFactor, (m_blocks[m_numBlocks].Height() / 2 - 1.5f) * m_b2ScaleFactor);
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 5.0f;
-    fixtureDef.friction = 0.7f;
-
-    m_blocks[m_numBlocks].body->CreateFixture(&fixtureDef);
-
-    m_numBlocks++;
-
-    m_blockFall.play();
-    */
-}
-
 void GameLogic::endGamePlay(bool win)
 {
     m_gameFinished = true;
@@ -441,7 +396,6 @@ void GameLogic::reset()
 
     m_gamePaused = false;
     m_gameFinished = false;
-    m_showClock = false;
     m_leaderBoardReady = false;
 
     m_scoreTime = 0;
@@ -463,8 +417,6 @@ void GameLogic::onLeftRelease(float x, float y)
             // We are "resuming" play
             m_resumeTime = m_platform.getCurrentTime();
             m_click1.play();
-        } else {
-            addNextShape(x, m_sceneHeight - y);
         }
     }
 }
@@ -632,5 +584,3 @@ void GameLogic::onControlStopped(HawkControl control)
         }
     }
 }
-
-} /* namespace blocks */

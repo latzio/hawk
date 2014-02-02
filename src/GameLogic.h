@@ -33,9 +33,6 @@
 
 #include <GLES/gl.h>
 
-
-namespace blocks {
-
 class ContactListener : public b2ContactListener {
 public:
     ContactListener(const Sound& sound) : m_sound(sound){};
@@ -73,9 +70,6 @@ private:
 
     float m_sceneWidth, m_sceneHeight;
 
-    float m_velocityTreshold;
-    long m_angstCountdown;
-
     Sprite m_background;
     Sprite m_leaderBoard;
     Sprite m_smallBlockBelligerent;
@@ -111,8 +105,6 @@ private:
 
     button m_playButton;
 
-    bool m_showClock;
-    int m_time;
     int m_scoreTime;
     time_t m_resumeTime;
     int m_score;
@@ -160,5 +152,4 @@ private:
     ContactListener m_contactListener;
 };
 
-} /* namespace blocks */
 #endif /* GAMELOGIC_H_ */

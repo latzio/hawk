@@ -15,7 +15,9 @@
 */
 
 #include "Platform.h"
+
 #include "bbutil.h"
+#include "HawkEngine.h"
 
 #include <sqlite3.h>
 
@@ -30,15 +32,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-
-#ifndef NDEBUG
-#include <assert.h>
-#define ASSERT(a) (assert(a))
-#else
-#define ASSERT(a)
-#endif
-
-namespace blocks {
 
 static const char SCORELOOP_GAME_ID[] = "d346c484-12aa-49a2-a0a0-de2f87492d72";
 static const char SCORELOOP_GAME_SECRET[] = "aAa+DehBfyGO/CYaE3nWomgu7SIbWFczUih+Qwf3/n7u0y3nyq5Hag==";
@@ -788,4 +781,3 @@ void Platform::fetchLocalScores(std::vector<Score>& scores)
     sqlite3_finalize(selectStmt);
 }
 
-} /* namespace blocks */

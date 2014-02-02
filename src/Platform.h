@@ -35,9 +35,6 @@
 
 #include <time.h>
 
-
-namespace blocks {
-
 /**
  * A particular user's score from the leaderboard.
  */
@@ -390,5 +387,4 @@ private:
     sqlite3* m_db;
 };
 
-} /* namespace blocks */
 #endif /* PLATFORM_H_ */

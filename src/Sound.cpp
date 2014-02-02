@@ -26,8 +26,6 @@
 #define ASSERT(a)
 #endif
 
-namespace blocks {
-
 static const int BufferSize = 1 * 1024 * 1024;
 
 Sound::Sound()
@@ -204,5 +202,3 @@ void Sound::unload() {
         m_buffers.clear();
     }
 }
-
-} /* namespace blocks */

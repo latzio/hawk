@@ -26,8 +26,6 @@
 
 #include <vector>
 
-namespace blocks {
-
 /**
  * Play a sound
  */
@@ -98,7 +96,5 @@ private:
     std::vector<ALuint> m_buffers;
     ALuint m_source;
 };
-
-} /* namespace blocks */
 
 #endif /* SOUND_H_ */
