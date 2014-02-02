@@ -17,6 +17,7 @@ void HawkBody::createBody(const HawkPoint& point)
     def.position = Hawk::toMeters(point);
 
     m_body = m_world->CreateBody(&def);
+    m_body->SetUserData(this);
 }
 
 void HawkBody::destroyBody()
