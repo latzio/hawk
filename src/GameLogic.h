@@ -22,6 +22,7 @@
 #ifndef GAMELOGIC_H_
 #define GAMELOGIC_H_
 
+#include "HawkBody.h"
 #include "Platform.h"
 #include "Sound.h"
 #include "bbutil.h"
@@ -32,12 +33,6 @@
 
 #include <GLES/gl.h>
 
-#ifndef NDEBUG
-#include <assert.h>
-#define ASSERT(a) (assert(a))
-#else
-#define ASSERT(a)
-#endif
 
 namespace blocks {
 
@@ -56,66 +51,6 @@ private:
     const Sound& m_sound;
 };
 
-typedef b2Vec2 HawkPoint;
-typedef b2Vec2 HawkVector;
-typedef b2Vec3 HawkVector3D;
-
-class Hawk {
-public:
-    static float pix2M(int pixels) { return pixels * 0.01f; }
-    static float pix2M(float pixels) { return pixels * 0.01f; }
-
-    static int m2Pix(int meters) { return meters * 100; }
-    static float m2Pix(float meters) { return meters * 100; }
-
-    static HawkPoint toMeters(const HawkPoint& other) { return HawkPoint(pix2M(other.x), pix2M(other.y)); }
-    static HawkPoint toPixels(const HawkPoint& other) { return HawkPoint(m2Pix(other.x), m2Pix(other.y)); }
-
-private:
-    Hawk();
-};
-
-class HawkBody {
-public:
-    /**
-     * Root class of HawkBody instances that interact with Box2D.
-     * A HawkBody owns a b2Body and wraps it for the HawkEngine.
-     *
-     * All HawkBody operations are performed in SI Units, such as meters and seconds.
-     *
-     */
-    HawkBody(b2World* world)
-        : m_world(world)
-        , m_body(0)
-    {
-        ASSERT(world);
-    }
-
-    enum Dynamics {
-        Dynamic = b2_dynamicBody,
-        Static = b2_staticBody,
-    };
-
-    void createBody(const HawkPoint&, Dynamics);
-    void destroyBody();
-
-    void createSprite(const char* path);
-
-    Sprite* sprite() { return &m_sprite; }
-
-    void draw() { m_sprite.draw(); }
-    b2Body* body() { return m_body; }
-
-    float width() const { return m_sprite.Width(); }
-    float height() const { return m_sprite.Height(); }
-
-    void createFixtureFromSprite();
-
-private:
-    b2World* m_world;
-    b2Body* m_body;
-    Sprite m_sprite;
-};
 
 class GameLogic : public HawkInputHandler {
 public:
