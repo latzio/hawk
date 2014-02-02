@@ -12,6 +12,10 @@
 
 #include "Sprite.h"
 
+struct HawkBodyDef {
+    b2World* world;
+};
+
 class HawkBody {
 public:
     /**
@@ -21,19 +25,15 @@ public:
      * All HawkBody operations are performed in SI Units, such as meters and seconds.
      *
      */
-    HawkBody(b2World* world)
-        : m_world(world)
+    HawkBody(const HawkBodyDef& def)
+        : m_world(def.world)
         , m_body(0)
     {
-        ASSERT(world);
+        ASSERT(m_world);
     }
+    virtual ~HawkBody() { }
 
-    enum Dynamics {
-        Dynamic = b2_dynamicBody,
-        Static = b2_staticBody,
-    };
-
-    void createBody(const HawkPoint&, Dynamics);
+    void createBody(const HawkPoint&);
     void destroyBody();
 
     void createSprite(const char* path);
@@ -48,10 +48,57 @@ public:
 
     void createFixtureFromSprite();
 
-private:
+protected:
+    virtual b2BodyType bodyType() const { return b2_staticBody; }
+
+protected:
     b2World* m_world;
     b2Body* m_body;
     Sprite m_sprite;
+};
+
+struct DynamicHawkBodyDef : HawkBodyDef {
+    HawkVector speed;
+    HawkVector burst;
+};
+
+class DynamicHawkBody : public HawkBody {
+public:
+    DynamicHawkBody(const DynamicHawkBodyDef& def)
+        : HawkBody(def)
+        , m_horizontal(Coast)
+        , m_vertical(Coast)
+        , m_speed(def.speed)
+        , m_burst(def.burst)
+    { }
+    virtual ~DynamicHawkBody() { }
+
+    // Movement this object should take when applyImpulses is called on its next update.
+    // Note that bursts are reset to Coast when processed, but cruises remain until updated manually.
+    enum Movement {
+        Coast, // Slide/glide as gravity and friction dictate. Rest idle.
+        Stop, // Actively try to slow down and stop.
+        NegativeCruise, // Move leftward or downward.
+        PositiveCruise, // Move rightward or upward.
+        NegativeBurst, // Burst leftward or downward.
+        PositiveBurst, // Burst rightward or upward.
+    };
+
+    void applyImpulses();
+
+    void setHorizontalMovement(Movement movement) { m_horizontal = movement; }
+    void setVerticalMovement(Movement movement) { m_vertical = movement; }
+
+private:
+    virtual b2BodyType bodyType() const { return b2_dynamicBody; }
+
+    Movement m_horizontal;
+    Movement m_vertical;
+
+    // Speed is maximum crusing speed when moving constantly.
+    // Burst is used when moving once such as a jump or roll.
+    const HawkVector m_speed;
+    const HawkVector m_burst;
 };
 
 #endif /* HAWKBODY_H_ */

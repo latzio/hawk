@@ -28,6 +28,7 @@
 #include "bbutil.h"
 #include "Sprite.h"
 
+#include <list>
 #include <math.h>
 #include "Box2D/Box2D.h"
 
@@ -79,8 +80,6 @@ private:
     Sprite m_buttonPressed;
     Sprite m_buttonRegular;
 
-    float m_blocksToAddYOffset;
-
     struct button {
         float posX;
         float posY;
@@ -119,9 +118,12 @@ private:
     float m_timeStep;
     int m_velocityIterations, m_positionIterations;
     b2World m_world;
-    b2Body* m_groundBody;
-    HawkBody m_ground;
-    HawkBody m_player;
+
+    std::list<HawkBody*> m_terrain;
+    std::list<DynamicHawkBody*> m_actors;
+
+    HawkBody* m_ground;
+    DynamicHawkBody* m_player;
 
     virtual void onLeftPress(float x, float y);
     virtual void onLeftRelease(float x, float y);

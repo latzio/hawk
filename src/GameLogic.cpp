@@ -57,8 +57,8 @@ GameLogic::GameLogic(Platform &platform)
     , m_velocityIterations(6)
     , m_positionIterations(2)
     , m_world(b2Vec2(0.0f, -10.0f))
-    , m_ground(&m_world)
-    , m_player(&m_world)
+    , m_ground(0)
+    , m_player(0)
     , m_contactListener(m_clickReverb)
 {
 
@@ -140,22 +140,28 @@ GameLogic::GameLogic(Platform &platform)
     m_playButton.textY = -textSizeY / 2;
     m_playButton.setPosition(m_sceneWidth / 2, m_leaderBoard.PosY() - m_leaderBoard.Height() / 2);
 
-
     //Box2D initialization and scene setup
     m_world.SetContactListener(&m_contactListener);
 
-    m_ground.createSprite("app/native/ground.png");
-    m_ground.sprite()->setSize(m_sceneWidth / 2, m_ground.height());
+    DynamicHawkBodyDef def;
+    def.world = &m_world;
+    def.speed = HawkVector(4, 4);
+    def.burst = HawkVector(6, 6);
 
-    HawkPoint groundCenter(m_sceneWidth / 2, m_ground.height() / 2);
-    m_ground.createBody(groundCenter, HawkBody::Static);
-    m_ground.createFixtureFromSprite();
+    m_ground = new HawkBody(def);
+    m_ground->createSprite("app/native/ground.png");
+    m_ground->sprite()->setSize(m_sceneWidth / 2, m_ground->height());
 
-    m_player.createSprite("app/native/resting.png");
+    HawkPoint groundCenter(m_sceneWidth / 2, m_ground->height() / 2);
+    m_ground->createBody(groundCenter);
+    m_ground->createFixtureFromSprite();
+
+    m_player = new DynamicHawkBody(def);
+    m_player->createSprite("app/native/resting.png");
 
     HawkPoint center(m_sceneWidth / 2, m_sceneHeight / 2);
-    m_player.createBody(center, HawkBody::Dynamic);
-    m_player.createFixtureFromSprite();
+    m_player->createBody(center);
+    m_player->createFixtureFromSprite();
 
 }
 
@@ -216,14 +222,15 @@ void GameLogic::update()
         return;
     }
 
+    m_player->applyImpulses();
     m_world.Step(m_timeStep, m_velocityIterations, m_positionIterations);
 
     time_t now = m_platform.getCurrentTime();
     m_scoreTime += (now - m_resumeTime);
     m_resumeTime = now;
 
-    HawkPoint position = m_player.body()->GetPosition();
-    if (Hawk::m2Pix(position.y) < -m_player.height()) {
+    HawkPoint position = m_player->body()->GetPosition();
+    if (Hawk::m2Pix(position.y) < -m_player->height()) {
         endGamePlay(false);
         return;
     }
@@ -284,18 +291,18 @@ void GameLogic::renderGame()
 
     //Draw ground
     glPushMatrix();
-    HawkVector position = Hawk::toPixels(m_ground.body()->GetPosition());
+    HawkVector position = Hawk::toPixels(m_ground->body()->GetPosition());
     glTranslatef(position.x, position.y, 0);
-    glRotatef((180 * m_ground.body()->GetAngle() / M_PI), 0.0f, 0.0f, 1.0f);
-    m_ground.draw();
+    glRotatef((180 * m_ground->body()->GetAngle() / M_PI), 0.0f, 0.0f, 1.0f);
+    m_ground->draw();
     glPopMatrix();
 
 
     glPushMatrix();
-    position = Hawk::toPixels(m_player.body()->GetPosition());
+    position = Hawk::toPixels(m_player->body()->GetPosition());
     glTranslatef(position.x, position.y, 0);
-    glRotatef((180 * m_player.body()->GetAngle() / M_PI), 0.0f, 0.0f, 1.0f);
-    m_player.draw();
+    glRotatef((180 * m_player->body()->GetAngle() / M_PI), 0.0f, 0.0f, 1.0f);
+    m_player->draw();
     glPopMatrix();
 
 
@@ -387,9 +394,9 @@ void GameLogic::endGamePlay(bool win)
 
 void GameLogic::reset()
 {
-    m_player.destroyBody();
-    m_player.createBody(HawkPoint(m_sceneWidth / 2, m_sceneHeight / 2), HawkBody::Dynamic);
-    m_player.createFixtureFromSprite();
+    m_player->destroyBody();
+    m_player->createBody(HawkPoint(m_sceneWidth / 2, m_sceneHeight / 2));
+    m_player->createFixtureFromSprite();
 
     //Initialize shape list
     m_state = GamePlay;
@@ -538,18 +545,15 @@ void GameLogic::onControlStarted(HawkControl control)
         m_click1.play();
     } else if (m_state == GamePlay) {
         if (!m_gamePaused) {
-            b2Body* body = m_player.body();
-            HawkVector currentVelocity = body->GetLinearVelocity();
-            HawkVector desiredVelocity(0, 0);
             switch (control) {
             case MoveLeft:
-                desiredVelocity.x = -2;
+                m_player->setHorizontalMovement(DynamicHawkBody::NegativeCruise);
                 break;
             case MoveRight:
-                desiredVelocity.x = 2;
+                m_player->setHorizontalMovement(DynamicHawkBody::PositiveCruise);
                 break;
             case ActionA:
-                desiredVelocity.y = 10;
+                m_player->setVerticalMovement(DynamicHawkBody::PositiveBurst);
                 break;
             case ActionB:
             case ActionX:
@@ -558,13 +562,6 @@ void GameLogic::onControlStarted(HawkControl control)
             case Menu2:
                 onPause();
                 break;
-            }
-
-            if (desiredVelocity.LengthSquared()) {
-                HawkVector impulse = (desiredVelocity - currentVelocity);
-                impulse.x *= body->GetMass();
-                impulse.y *= body->GetMass();
-                body->ApplyLinearImpulse(impulse, body->GetWorldCenter(), true);
             }
         }
     }
@@ -580,6 +577,24 @@ void GameLogic::onControlStopped(HawkControl control)
         if (m_gamePaused) {
             if (control == Menu2) {
                 onResume();
+            }
+        } else {
+            switch (control) {
+            case MoveLeft:
+                m_player->setHorizontalMovement(DynamicHawkBody::Stop);
+                break;
+            case MoveRight:
+                m_player->setHorizontalMovement(DynamicHawkBody::Stop);
+                break;
+            case ActionA:
+                break;
+            case ActionB:
+            case ActionX:
+            case ActionY:
+                break;
+            case Menu2:
+                onPause();
+                break;
             }
         }
     }
