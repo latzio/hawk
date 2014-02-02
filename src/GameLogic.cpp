@@ -147,6 +147,7 @@ GameLogic::GameLogic(Platform &platform)
     def.world = &m_world;
     def.speed = HawkVector(4, 4);
     def.burst = HawkVector(6, 6);
+    def.fixedRotation = true;
 
     m_ground = new HawkBody(def);
     m_ground->createSprite("app/native/ground.png");
