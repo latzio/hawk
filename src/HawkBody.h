@@ -33,7 +33,7 @@ public:
     }
     virtual ~HawkBody() { }
 
-    void createBody(const HawkPoint&);
+    virtual void createBody(const HawkPoint&);
     void destroyBody();
 
     void createSprite(const char* path);
@@ -60,6 +60,7 @@ protected:
 struct DynamicHawkBodyDef : HawkBodyDef {
     HawkVector speed;
     HawkVector burst;
+    bool fixedRotation;
 };
 
 class DynamicHawkBody : public HawkBody {
@@ -70,6 +71,7 @@ public:
         , m_vertical(Coast)
         , m_speed(def.speed)
         , m_burst(def.burst)
+        , m_fixedRotation(def.fixedRotation)
     { }
     virtual ~DynamicHawkBody() { }
 
@@ -84,6 +86,7 @@ public:
         PositiveBurst, // Burst rightward or upward.
     };
 
+    virtual void createBody(const HawkPoint&);
     void applyImpulses();
 
     void setHorizontalMovement(Movement movement) { m_horizontal = movement; }
@@ -99,6 +102,7 @@ private:
     // Burst is used when moving once such as a jump or roll.
     const HawkVector m_speed;
     const HawkVector m_burst;
+    const bool m_fixedRotation;
 };
 
 #endif /* HAWKBODY_H_ */

@@ -52,6 +52,12 @@ void HawkBody::createFixtureFromSprite()
     m_body->CreateFixture(&def);
 }
 
+void DynamicHawkBody::createBody(const HawkPoint& point)
+{
+    HawkBody::createBody(point);
+    m_body->SetFixedRotation(m_fixedRotation);
+}
+
 // This method must write to desired.
 // It always set Burst back to Coast, Stop to coast once stopped.
 static void processSingleAxisOfMovement(const float speed, const float burst, const float current, float& desired, DynamicHawkBody::Movement& movement)
