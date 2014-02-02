@@ -380,42 +380,38 @@ void Platform::processEvents()
 
                 break;
             }
-                /*
-                 case SCREEN_EVENT_DEVICE:
-                 {
-                 // A device was attached or removed.
-                 screen_device_t device;
-                 int attached;
-                 int type;
+            case SCREEN_EVENT_DEVICE:
+            {
+                // A device was attached or removed.
+                screen_device_t device;
+                int attached;
+                int type;
 
-                 screen_get_event_property_pv(screenEvent, SCREEN_PROPERTY_DEVICE, (void**)&device);
-                 screen_get_event_property_iv(screenEvent, SCREEN_PROPERTY_ATTACHED, &attached);
+                screen_get_event_property_pv(screenEvent, SCREEN_PROPERTY_DEVICE, (void**)&device);
+                screen_get_event_property_iv(screenEvent, SCREEN_PROPERTY_ATTACHED, &attached);
 
-                 if (attached) {
-                 screen_get_device_property_iv(device, SCREEN_PROPERTY_TYPE, &type);
-                 }
+                if (attached) {
+                    screen_get_device_property_iv(device, SCREEN_PROPERTY_TYPE, &type);
+                }
 
-                 int i;
-                 if (attached && (type == SCREEN_EVENT_GAMEPAD || type == SCREEN_EVENT_JOYSTICK)) {
-                 for (i = 0; i < MaxControllers; ++i) {
-                 if (!m_controllers[i].handle) {
-                 m_controllers[i].handle = device;
-                 loadController(&m_controllers[i]);
-                 break;
-                 }
-                 }
-                 } else {
-                 for (i = 0; i < MaxControllers; ++i) {
-                 if (device == m_controllers[i].handle) {
-                 initController(&m_controllers[i], i);
-                 break;
-                 }
-                 }
-                 }
-
-                 break;
-                 }
-                 */
+                if (attached && (type == SCREEN_EVENT_GAMEPAD || type == SCREEN_EVENT_JOYSTICK)) {
+                    for (int i = 0; i < MaxControllers; ++i) {
+                        if (!m_controllers[i].handle) {
+                            m_controllers[i].handle = device;
+                            loadController(&m_controllers[i]);
+                            break;
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < MaxControllers; ++i) {
+                        if (device == m_controllers[i].handle) {
+                            m_controllers[i] = GameController(); // Disconnected. Reset.
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
             }
         } else if (dialog_get_domain() == domain) {
             if (DIALOG_RESPONSE == code) {
