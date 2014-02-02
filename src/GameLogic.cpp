@@ -57,7 +57,6 @@ GameLogic::GameLogic(Platform &platform)
     , m_velocityIterations(6)
     , m_positionIterations(2)
     , m_world(b2Vec2(0.0f, -10.0f))
-    , m_ground(0)
     , m_player(0)
     , m_contactListener(m_clickReverb)
 {
@@ -149,13 +148,15 @@ GameLogic::GameLogic(Platform &platform)
     def.burst = HawkVector(6, 6);
     def.fixedRotation = true;
 
-    m_ground = new HawkBody(def);
-    m_ground->createSprite("app/native/ground.png");
-    m_ground->sprite()->setSize(m_sceneWidth / 2, m_ground->height());
+    for (int i = 0; i < 4; ++i) {
+        HawkBody* platform = new HawkBody(def);
+        platform->createSprite("app/native/ground.png");
 
-    HawkPoint groundCenter(m_sceneWidth / 2, m_ground->height() / 2);
-    m_ground->createBody(groundCenter);
-    m_ground->createFixtureFromSprite();
+        HawkPoint center(i * (m_sceneWidth / 4) + platform->width() / 2, ((i * 2) * 200) + platform->height());
+        platform->createBody(center);
+        platform->createFixtureFromSprite();
+        m_terrain.push_back(platform);
+    }
 
     m_player = new DynamicHawkBody(def);
     m_player->createSprite("app/native/resting.png");
@@ -290,17 +291,22 @@ void GameLogic::renderGame()
         return;
     }
 
-    //Draw ground
+    // Draw terrain
     glPushMatrix();
-    HawkVector position = Hawk::toPixels(m_ground->body()->GetPosition());
-    glTranslatef(position.x, position.y, 0);
-    glRotatef((180 * m_ground->body()->GetAngle() / M_PI), 0.0f, 0.0f, 1.0f);
-    m_ground->draw();
+    std::list<HawkBody*>::iterator it = m_terrain.begin();
+    std::list<HawkBody*>::iterator last = m_terrain.end();
+    for (; it != last; ++it) {
+        // Skip rotation for now as we don't have any.
+        HawkVector position = Hawk::toPixels((*it)->body()->GetPosition());
+        glTranslatef(position.x, position.y, 0);
+        (*it)->draw();
+        glTranslatef(-position.x, -position.y, 0);
+    }
     glPopMatrix();
 
 
     glPushMatrix();
-    position = Hawk::toPixels(m_player->body()->GetPosition());
+    HawkPoint position = Hawk::toPixels(m_player->body()->GetPosition());
     glTranslatef(position.x, position.y, 0);
     glRotatef((180 * m_player->body()->GetAngle() / M_PI), 0.0f, 0.0f, 1.0f);
     m_player->draw();

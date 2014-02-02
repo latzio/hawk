@@ -122,7 +122,6 @@ private:
     std::list<HawkBody*> m_terrain;
     std::list<DynamicHawkBody*> m_actors;
 
-    HawkBody* m_ground;
     DynamicHawkBody* m_player;
 
     virtual void onLeftPress(float x, float y);
