@@ -145,14 +145,14 @@ GameLogic::GameLogic(Platform &platform)
     DynamicHawkBodyDef def;
     def.world = &m_world;
     def.speed = HawkVector(4, 4);
-    def.burst = HawkVector(6, 6);
+    def.burst = HawkVector(8, 8);
     def.fixedRotation = true;
 
     for (int i = 0; i < 4; ++i) {
         HawkBody* platform = new HawkBody(def);
         platform->createSprite("app/native/ground.png");
 
-        HawkPoint center(i * (m_sceneWidth / 4) + platform->width() / 2, ((i * 2) * 200) + platform->height());
+        HawkPoint center((i * (m_sceneWidth / 4)) + (platform->width() / 2), ((i % 2) * 200) + platform->height());
         platform->createBody(center);
         platform->createFixtureFromSprite();
         m_terrain.push_back(platform);
