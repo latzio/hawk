@@ -3,14 +3,14 @@
 
 <qnx xmlns="http://www.qnx.com/schemas/application/1.0">
 
-   <id>com.example.BelligerentBlocks</id>
+   <id>com.example.Hawk</id>
 
-   <name>BBlocks</name>
+   <name>Hawk</name>
 
    <versionNumber>1.0.0</versionNumber>
    <buildId>10</buildId>
 
-   <description>The Belligerent Blocks application</description>
+   <description>Hawk Adventure</description>
 
    <author>Mike Lattanzio</author>
    <authorId>gYAAgEQn7sV0u_TVfQiyzYlDq1s</authorId>
@@ -60,20 +60,14 @@
 
    <configuration name="Device-Release">
       <platformArchitecture>armle-v7</platformArchitecture>
-      <asset path="Device-Release/BelligerentBlocks" entry="true" type="Qnx/Elf">Blocks</asset>
+      <asset path="Device-Release/Hawk" entry="true" type="Qnx/Elf">Hawk</asset>
    </configuration>
-
-   <configuration name="Simulator">
-      <platformArchitecture>x86</platformArchitecture>
-      <asset path="Simulator/BelligerentBlocks" entry="true" type="Qnx/Elf">Blocks</asset>
-   </configuration>
-
    <configuration name="Device-Debug">
       <platformArchitecture>armle-v7</platformArchitecture>
-      <asset path="Device-Debug/BelligerentBlocks" entry="true" type="Qnx/Elf">Blocks</asset>
+      <asset path="Device-Debug/Hawk" entry="true" type="Qnx/Elf">Hawk</asset>
    </configuration>
    <configuration name="Simulator-Debug">
       <platformArchitecture>x86</platformArchitecture>
-      <asset path="Simulator-Debug/BelligerentBlocks" entry="true" type="Qnx/Elf">BelligerentBlocks</asset>
+      <asset path="Simulator-Debug/Hawk" entry="true" type="Qnx/Elf">Hawk</asset>
    </configuration>
 </qnx>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>BelligerentBlocks</name>
+	<name>Hawk</name>
 	<comment></comment>
 	<projects>
 		<project>Box2D</project>
